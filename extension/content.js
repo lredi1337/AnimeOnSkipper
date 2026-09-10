@@ -74,6 +74,8 @@
     malId: null,
     episode: 1,
     title: '',
+    isManualEpisode: false,
+    manualEpisode: null,
 
     extract() {
       let detectedId = null;
@@ -115,6 +117,12 @@
         }
       }
 
+      // Если тайтл сменился, сбрасываем ручной оверрайд серии
+      if (detectedId && this.malId && detectedId !== this.malId) {
+        this.isManualEpisode = false;
+        this.manualEpisode = null;
+      }
+
       this.malId = detectedId || this.malId;
 
       // Определение названия тайтла
@@ -139,14 +147,23 @@
       });
       if (maxEp > 0) this.totalEpisodes = maxEp;
 
-      const ep = this.detectActiveEpisode();
-      if (ep) this.episode = ep;
+      if (this.isManualEpisode && this.manualEpisode) {
+        this.episode = this.manualEpisode;
+      } else {
+        const ep = this.detectActiveEpisode();
+        if (ep) this.episode = ep;
+      }
 
       return { malId: this.malId, episode: this.episode, title: this.title, season: this.season, totalEpisodes: this.totalEpisodes || null };
     },
 
     detectActiveEpisode() {
-      // 0. ПРИОРИТЕТ 0: Параметры текущего URL (search query и hash)
+      // Если включена ручная корректировка, возвращаем её
+      if (this.isManualEpisode && this.manualEpisode) {
+        return this.manualEpisode;
+      }
+
+      // 0. ПРИОРИТЕТ 0: Параметры текущего URL (search query, hash и path)
       try {
         const urlParams = new URLSearchParams(window.location.search);
         const qEp = urlParams.get('episode') || urlParams.get('ep') || urlParams.get('series') || urlParams.get('e');
@@ -161,11 +178,19 @@
           const num = parseInt(hMatch[1], 10);
           if (num > 0 && num <= 2000) return num;
         }
+
+        const path = decodeURIComponent(window.location.pathname);
+        const mPath = path.match(/\/(?:anime|watch|title)\/[^\/]+?\/(\d+)(?:[/?#]|$)/i) ||
+                      path.match(/\/(?:episode|series|ep|выпуск|серия)[-\/]?(\d+)(?:[/?#]|$)/i);
+        if (mPath && mPath[1]) {
+          const num = parseInt(mPath[1], 10);
+          if (num > 0 && num <= 2000) return num;
+        }
       } catch (e) {}
 
       // 1. ПРИОРИТЕТ 1: Точный бейдж текущей серии на AnimeOn
       // Пример из разметки страницы: <span data-slot="badge" ...>2 эпизод</span>
-      const badges = document.querySelectorAll('span[data-slot="badge"], [data-slot="badge"]');
+      const badges = document.querySelectorAll('span[data-slot="badge"], [data-slot="badge"], .badge');
       for (const b of badges) {
         const txt = (b.textContent || '').trim();
         if (txt.includes('серий') || txt.includes('из') || txt.includes('всего') || txt.includes('сезон')) continue;
@@ -178,31 +203,63 @@
       }
 
       // 2. ПРИОРИТЕТ 2: Активная кнопка серии в списке AnimeOn
-      // Пример из разметки страницы:
-      // <button data-episode="2" aria-label="Серия 2" class="... border-violet-500/50 shadow-[0_2px_8px_rgba(124,77,255,0.5)]">
-      //   <div class="absolute inset-0 bg-violet-600 transition-all duration-200"></div>
-      //   <span class="relative z-10 text-white">2</span>
-      // </button>
-      const epBtns = document.querySelectorAll('button[data-episode]');
-      for (const btn of epBtns) {
-        const cls = btn.className || '';
-        const hasBgViolet = !!btn.querySelector('div[class*="bg-violet-600"], div[class*="bg-violet"]');
-        const hasBorderViolet = cls.includes('border-violet-500') || cls.includes('border-violet');
-        const hasActiveShadow = cls.includes('124,77,255');
-        const isAriaSelected = btn.getAttribute('aria-selected') === 'true' || btn.getAttribute('data-state') === 'active';
+      const epBtns = Array.from(document.querySelectorAll('button[data-episode], [data-episode]'));
+      if (epBtns.length > 0) {
+        // Шаг 2.1: Точное обнаружение активной серии по признакам активного состояния
+        for (const btn of epBtns) {
+          const cls = (btn.className || '').toLowerCase();
+          const hasWatchedBar = !!btn.querySelector('[class*="h-[2px]"], [class*="bottom-0"]');
 
-        if (hasBgViolet || hasBorderViolet || hasActiveShadow || isAriaSelected) {
-          const ep = parseInt(btn.getAttribute('data-episode'), 10);
-          if (!isNaN(ep) && ep > 0 && ep <= 2000) return ep;
+          // Главный признак активной серии на AnimeOn: полноразмерная заливка inset-0
+          const hasFullFill = !!btn.querySelector('[class*="inset-0"]');
+
+          // Признак 2: Неоновая тень/свечение активной кнопки (shadow-[...])
+          const hasShadow = cls.includes('shadow-') && !hasWatchedBar;
+
+          // Признак 3: ARIA и data-атрибуты активного элемента
+          const hasActiveAttr = btn.getAttribute('aria-selected') === 'true' ||
+                                btn.getAttribute('aria-current') === 'true' ||
+                                btn.getAttribute('aria-current') === 'page' ||
+                                btn.getAttribute('data-state') === 'active' ||
+                                btn.getAttribute('data-active') === 'true' ||
+                                btn.getAttribute('data-selected') === 'true';
+
+          // Признак 4: Отдельный класс active/selected/current (без учета фонов истории bg-violet-500/10)
+          const hasExactActiveClass = /\b(active|selected|current)\b/i.test(cls);
+
+          if (hasFullFill || hasShadow || hasActiveAttr || hasExactActiveClass) {
+            const ep = parseInt(btn.getAttribute('data-episode'), 10);
+            if (!isNaN(ep) && ep > 0 && ep <= 2000) return ep;
+          }
+        }
+
+        // Шаг 2.2: Запасной вариант — поиск кнопки с ярким белым текстом (без прозрачности)
+        for (const btn of epBtns) {
+          const span = btn.querySelector('span');
+          const spanCls = (span?.className || '').toLowerCase();
+          const hasWhiteText = spanCls.includes('text-white') && !spanCls.includes('text-white/');
+          const hasWatchedBar = !!btn.querySelector('[class*="h-[2px]"], [class*="bottom-0"]');
+
+          if (hasWhiteText && !hasWatchedBar) {
+            const ep = parseInt(btn.getAttribute('data-episode'), 10);
+            if (!isNaN(ep) && ep > 0 && ep <= 2000) return ep;
+          }
         }
       }
 
-      // 3. Любая кнопка с aria-label="Серия N" и активной подсветкой
-      const ariaBtns = document.querySelectorAll('button[aria-label*="ерия"], button[aria-label*="пизод"]');
+      // 3. Любая кнопка с aria-label="Серия N" (если нет data-episode)
+      const ariaBtns = Array.from(document.querySelectorAll('button[aria-label*="ерия"], button[aria-label*="пизод"]'));
       for (const btn of ariaBtns) {
-        const cls = btn.className || '';
-        const hasActiveBg = !!btn.querySelector('div[class*="bg-violet"]') || cls.includes('border-violet');
-        if (hasActiveBg) {
+        const cls = (btn.className || '').toLowerCase();
+        const hasWatchedBar = !!btn.querySelector('[class*="h-[2px]"], [class*="bottom-0"]');
+        const hasFullFill = !!btn.querySelector('[class*="inset-0"]');
+        const hasShadow = cls.includes('shadow-') && !hasWatchedBar;
+        const hasActiveAttr = btn.getAttribute('aria-selected') === 'true' ||
+                              btn.getAttribute('aria-current') === 'true' ||
+                              btn.getAttribute('data-state') === 'active';
+        const hasExactActive = /\b(active|selected|current)\b/i.test(cls);
+
+        if (hasFullFill || hasShadow || hasActiveAttr || hasExactActive) {
           const m = btn.getAttribute('aria-label').match(/\d+/);
           if (m) {
             const ep = parseInt(m[0], 10);
@@ -923,8 +980,15 @@
         hud.innerHTML = `
           <div class="aon-hud-header" id="aon-hud-drag-header">
             <div class="aon-hud-title-group">
-              <span class="aon-hud-title">⏱ Разметка таймингов</span>
-              <span class="aon-hud-meta-badge" id="aon-hud-meta">Серия 1</span>
+              <span class="aon-hud-title">⏱ Разметка</span>
+              <div class="aon-hud-ep-picker" title="Ручная корректировка серии">
+                <button type="button" class="aon-hud-ep-arrow" id="aon-hud-ep-prev" title="Предыдущая серия">‹</button>
+                <div class="aon-hud-ep-box">
+                  <span class="aon-hud-ep-txt">Серия</span>
+                  <input type="number" class="aon-hud-ep-num" id="aon-hud-ep-input" min="1" max="2000" value="1" title="Нажмите, чтобы ввести номер серии вручную">
+                </div>
+                <button type="button" class="aon-hud-ep-arrow" id="aon-hud-ep-next" title="Следующая серия">›</button>
+              </div>
             </div>
             <button class="aon-hud-close" id="aon-hud-btn-close" title="Закрыть (Alt + M)">&times;</button>
           </div>
@@ -1025,6 +1089,9 @@
         this.elements.saveBtn = hud.querySelector('#aon-btn-save-timings');
         this.elements.saveStatus = hud.querySelector('#aon-save-status');
         this.elements.metaBadge = hud.querySelector('#aon-hud-meta');
+        this.elements.epInput = hud.querySelector('#aon-hud-ep-input');
+        this.elements.epPrev = hud.querySelector('#aon-hud-ep-prev');
+        this.elements.epNext = hud.querySelector('#aon-hud-ep-next');
 
         this.attachListeners(hud, container);
         this.populateFromCurrent();
@@ -1051,6 +1118,41 @@
     attachListeners(hud, container) {
       // Закрытие
       hud.querySelector('#aon-hud-btn-close')?.addEventListener('click', () => this.hide());
+
+      // Ручная корректировка серии (стрелки и прямой ввод)
+      this.elements.epPrev?.addEventListener('click', () => {
+        const cur = parseInt(this.elements.epInput?.value, 10) || pageContext.episode || 1;
+        if (cur > 1) {
+          playbackSession.changeEpisode(cur - 1, true);
+        }
+      });
+
+      this.elements.epNext?.addEventListener('click', () => {
+        const cur = parseInt(this.elements.epInput?.value, 10) || pageContext.episode || 1;
+        if (cur < 2000) {
+          playbackSession.changeEpisode(cur + 1, true);
+        }
+      });
+
+      const commitManualEp = () => {
+        if (!this.elements.epInput) return;
+        const val = parseInt(this.elements.epInput.value, 10);
+        if (!isNaN(val) && val >= 1 && val <= 2000) {
+          playbackSession.changeEpisode(val, true);
+        } else {
+          this.elements.epInput.value = pageContext.episode || 1;
+        }
+      };
+
+      this.elements.epInput?.addEventListener('change', commitManualEp);
+      this.elements.epInput?.addEventListener('keydown', (e) => {
+        e.stopPropagation();
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          commitManualEp();
+          this.elements.epInput.blur();
+        }
+      });
 
       // Установка текущего времени по кнопкам
       hud.querySelector('#aon-btn-set-op-start')?.addEventListener('click', () => {
@@ -1181,6 +1283,9 @@
     }
 
     updateMeta() {
+      if (this.elements.epInput) {
+        this.elements.epInput.value = pageContext.episode || 1;
+      }
       if (this.elements.metaBadge) {
         this.elements.metaBadge.textContent = `Серия ${pageContext.episode || 1}`;
       }
@@ -1728,9 +1833,11 @@
     attachVideo(video) {
       this.video = video;
       this.controller.attach(video);
-      const detected = pageContext.detectActiveEpisode();
-      if (detected && detected !== pageContext.episode) {
-        pageContext.episode = detected;
+      if (!pageContext.isManualEpisode) {
+        const detected = pageContext.detectActiveEpisode();
+        if (detected && detected !== pageContext.episode) {
+          pageContext.episode = detected;
+        }
       }
       this.loadTimings();
       this.reportSession();
@@ -1742,12 +1849,23 @@
       this.video = null;
     }
 
-    changeEpisode(newEp) {
+    changeEpisode(newEp, isManual = false) {
+      if (isManual) {
+        pageContext.isManualEpisode = true;
+        pageContext.manualEpisode = newEp;
+      }
       if (pageContext.episode === newEp && this.currentEpisodeKey === `${pageContext.malId}:${newEp}`) {
+        if (isManual) {
+          toast.show(`📺 Серия ${newEp} (ручная фиксация)`);
+        }
         return;
       }
-      console.log(`[AnimeOn Skipper] Переключение на серию ${newEp}`);
+      console.log(`[AnimeOn Skipper] Переключение на серию ${newEp}${isManual ? ' (вручную)' : ''}`);
       pageContext.episode = newEp;
+      if (isManual) {
+        pageContext.isManualEpisode = true;
+        pageContext.manualEpisode = newEp;
+      }
       if (pageContext.malId) {
         try {
           sessionStorage.setItem(`aon_ep_${pageContext.malId}`, newEp);
@@ -1769,7 +1887,7 @@
         hudEditor.clearEd();
       }
 
-      toast.show(`📺 Серия ${newEp}`);
+      toast.show(isManual ? `📺 Серия ${newEp} (ручная коррекция)` : `📺 Серия ${newEp}`);
       this.loadTimings();
       this.reportSession();
     }
@@ -1916,9 +2034,16 @@
 
   // Периодическая проверка смены серии и поддержание HUD в контейнере
   setInterval(() => {
+    if (pageContext.isManualEpisode) {
+      playbackSession.recalculateAndRender();
+      if (hudEditor && playbackSession.video) {
+        hudEditor.ensure();
+      }
+      return;
+    }
     const ep = pageContext.detectActiveEpisode();
     if (ep && ep !== pageContext.episode) {
-      playbackSession.changeEpisode(ep);
+      playbackSession.changeEpisode(ep, false);
     } else {
       playbackSession.recalculateAndRender();
     }
@@ -1981,15 +2106,19 @@
 
     if (ep && ep > 0 && ep <= 2000 && ep !== pageContext.episode) {
       console.log(`[AnimeOn Skipper] Переключение на серию ${ep} по клику пользователя`);
-      playbackSession.changeEpisode(ep);
+      pageContext.isManualEpisode = false;
+      pageContext.manualEpisode = null;
+      playbackSession.changeEpisode(ep, false);
     }
   }, true);
 
   // Обработка сообщений от всплывающего окна (popup.js)
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.type === 'QUERY_PAGE_STATUS') {
-      const ep = pageContext.detectActiveEpisode();
-      if (ep) pageContext.episode = ep;
+      if (!pageContext.isManualEpisode) {
+        const ep = pageContext.detectActiveEpisode();
+        if (ep) pageContext.episode = ep;
+      }
 
       const res = playbackSession.intervals.resolved;
       const source = res.op?.source || res.ed?.source || null;
@@ -2010,7 +2139,7 @@
 
     if (msg.type === 'SET_MANUAL_EPISODE') {
       if (msg.episode && msg.episode > 0) {
-        playbackSession.changeEpisode(msg.episode);
+        playbackSession.changeEpisode(msg.episode, true);
         sendResponse({ success: true, episode: pageContext.episode });
       }
       return false;
@@ -2101,10 +2230,11 @@
   function initEpisodeObserver() {
     let throttleTimer = null;
     const check = () => {
+      if (pageContext.isManualEpisode) return;
       const ep = pageContext.detectActiveEpisode();
       if (ep && ep !== pageContext.episode) {
         console.log(`[AnimeOn Skipper] Наблюдатель DOM зафиксировал серию: ${ep}`);
-        playbackSession.changeEpisode(ep);
+        playbackSession.changeEpisode(ep, false);
       }
     };
 

@@ -36,6 +36,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  if (epDisplay) {
+    epDisplay.style.cursor = 'pointer';
+    epDisplay.title = 'Нажмите, чтобы ввести серию вручную';
+    epDisplay.addEventListener('click', () => {
+      const input = prompt('Введите номер серии:', currentEpisode);
+      if (input !== null) {
+        const num = parseInt(input.trim(), 10);
+        if (!isNaN(num) && num > 0 && num <= 2000) {
+          changeEpisode(num);
+        }
+      }
+    });
+  }
+
   function changeEpisode(newEp) {
     currentEpisode = newEp;
     if (epDisplay) epDisplay.textContent = `Серия ${newEp}`;
