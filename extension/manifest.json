@@ -9,6 +9,7 @@
   ],
   "host_permissions": [
     "*://*.animeon.cc/*",
+    "*://*.animeon.co/*",
     "*://*.animeon.su/*",
     "*://*.animeon.org/*",
     "*://*.animeon.to/*",
@@ -27,6 +28,7 @@
     {
       "matches": [
         "*://*.animeon.cc/*",
+        "*://*.animeon.co/*",
         "*://*.animeon.su/*",
         "*://*.animeon.org/*",
         "*://*.animeon.to/*",
@@ -47,6 +49,7 @@
     {
       "matches": [
         "*://*.animeon.cc/*",
+        "*://*.animeon.co/*",
         "*://*.animeon.su/*",
         "*://*.animeon.org/*",
         "*://*.animeon.to/*",
@@ -74,6 +77,7 @@
       ],
       "matches": [
         "*://*.animeon.cc/*",
+        "*://*.animeon.co/*",
         "*://*.animeon.su/*",
         "*://*.animeon.org/*",
         "*://*.animeon.to/*",
