@@ -1,0 +1,578 @@
+/* popup.css - Стили всплывающего окна настроек AnimeOn Skipper */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 320px;
+  background-color: #0a0a0f;
+  color: #f4f4f5;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  user-select: none;
+}
+
+.popup-container {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Шапка */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.logo-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.logo-glow {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #7c4dff;
+  box-shadow: 0 0 12px #7c4dff, 0 0 20px #a855f7;
+}
+
+.logo-title {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.accent-text {
+  background: linear-gradient(135deg, #a78bfa, #f472b6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.badge-version {
+  font-size: 10px;
+  font-weight: 700;
+  color: #a1a1aa;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Карточки */
+.card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.card-header,
+.card-header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.card-header {
+  justify-content: flex-start;
+  gap: 6px;
+}
+
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #71717a;
+  transition: all 0.3s ease;
+}
+
+.pulse-dot.dot-active {
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.card-title,
+.card-title-section {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #a1a1aa;
+}
+
+/* Текущее аниме */
+.current-anime-card {
+  background: linear-gradient(135deg, rgba(124, 77, 255, 0.12), rgba(168, 85, 247, 0.04));
+  border-color: rgba(124, 77, 255, 0.25);
+}
+
+.anime-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.anime-meta {
+  font-size: 11px;
+  color: #c4b5fd;
+  margin-top: 2px;
+}
+
+/* Селектор серии */
+.ep-selector-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.ep-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  color: #e4e4e7;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ep-btn:hover {
+  background: rgba(124, 77, 255, 0.3);
+  border-color: rgba(124, 77, 255, 0.6);
+}
+
+.ep-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #f3e8ff;
+  background: rgba(124, 77, 255, 0.2);
+  border: 1px solid rgba(124, 77, 255, 0.3);
+  padding: 3px 10px;
+  border-radius: 6px;
+}
+
+/* Статус тайминга */
+.timing-status {
+  margin-top: 8px;
+}
+
+.timing-tag {
+  display: inline-block;
+  font-size: 10.5px;
+  color: #a1a1aa;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 2px 7px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.timing-tag.tag-success {
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+.timing-tag.tag-custom {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+.timing-custom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.btn-clear-skip {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+  border-radius: 5px;
+  font-size: 10px;
+  padding: 2px 7px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+
+.btn-clear-skip:hover {
+  background: rgba(239, 68, 68, 0.35);
+  border-color: rgba(239, 68, 68, 0.7);
+  color: #ffffff;
+}
+
+/* Тумблеры */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  cursor: pointer;
+  position: relative;
+}
+
+.toggle-row:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.toggle-label {
+  display: flex;
+  flex-direction: column;
+  padding-right: 12px;
+}
+
+.toggle-label strong {
+  font-size: 12px;
+  color: #e4e4e7;
+}
+
+.toggle-label small {
+  font-size: 10px;
+  color: #71717a;
+}
+
+.toggle-input {
+  position: absolute;
+  opacity: 0;
+}
+
+.toggle-slider {
+  width: 36px;
+  height: 20px;
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+
+.toggle-slider::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.toggle-input:checked + .toggle-slider {
+  background-color: #7c4dff;
+  box-shadow: 0 0 12px rgba(124, 77, 255, 0.5);
+}
+
+.toggle-input:checked + .toggle-slider::before {
+  transform: translateX(16px);
+}
+
+/* Слайдер смещения */
+.slider-row {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.slider-label-wrap {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.slider-val {
+  color: #a78bfa;
+  font-family: monospace;
+}
+
+input[type="range"] {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #7c4dff;
+  box-shadow: 0 0 8px #7c4dff;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.slider-hint {
+  display: block;
+  font-size: 9.5px;
+  color: #71717a;
+  margin-top: 4px;
+}
+
+/* Кнопки экспорта/импорта */
+.badge-count {
+  font-size: 10px;
+  color: #a78bfa;
+  background: rgba(124, 77, 255, 0.15);
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+
+.btn-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.btn {
+  flex: 1;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #f4f4f5;
+  transition: all 0.15s ease;
+}
+
+.btn:hover {
+  background: rgba(124, 77, 255, 0.2);
+  border-color: rgba(124, 77, 255, 0.4);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, rgba(124, 77, 255, 0.4), rgba(168, 85, 247, 0.4));
+  border-color: rgba(124, 77, 255, 0.6);
+  color: #f3e8ff;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, rgba(124, 77, 255, 0.6), rgba(168, 85, 247, 0.6));
+  border-color: rgba(168, 85, 247, 0.8);
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 11px;
+}
+
+/* Секция Cloudflare */
+.cloudflare-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cf-status-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #a1a1aa;
+  transition: all 0.2s ease;
+}
+
+.cf-status-badge.cf-connected {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.4);
+  color: #4ade80;
+}
+
+.cf-status-badge.cf-error {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #f87171;
+}
+
+.cf-input-row {
+  display: flex;
+  gap: 6px;
+}
+
+.cf-input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: #ffffff;
+  font-size: 11px;
+  outline: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  transition: border-color 0.2s ease;
+}
+
+.cf-input:focus {
+  border-color: #7c4dff;
+  box-shadow: 0 0 8px rgba(124, 77, 255, 0.3);
+}
+
+.cf-hint {
+  font-size: 10px;
+  color: #71717a;
+  line-height: 1.3;
+}
+
+/* Горячие клавиши */
+.hotkeys-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hotkey-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: #a1a1aa;
+}
+
+kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 5px;
+  font-family: monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: #ffffff;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.hint-card {
+  background: rgba(124, 77, 255, 0.08) !important;
+  border: 1px solid rgba(124, 77, 255, 0.22) !important;
+  padding: 10px 12px !important;
+}
+
+.hint-text {
+  font-size: 11px;
+  line-height: 1.45;
+  color: #d4d4d8;
+}
+
+.hint-text strong {
+  color: #c084fc;
+}
+
+/* Аккаунт автора */
+.auth-card {
+  background: rgba(139, 92, 246, 0.07);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+}
+
+.user-role-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #a1a1aa;
+}
+
+.user-role-badge.role-trusted {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #7dd3fc;
+}
+
+.user-role-badge.role-admin {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #6ee7b7;
+}
+
+.user-role-badge.role-user {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: #c4b5fd;
+}
+
+.auth-hint {
+  font-size: 11px;
+  color: #a1a1aa;
+  line-height: 1.35;
+}
+
+.auth-link {
+  font-size: 11px;
+  color: #a78bfa;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+
+.auth-link:hover {
+  color: #c084fc;
+  text-decoration: underline;
+}
+
+.user-profile-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.user-stats-text {
+  font-size: 10px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+/* Футер */
+.footer {
+  text-align: center;
+  font-size: 10px;
+  color: #52525b;
+}
