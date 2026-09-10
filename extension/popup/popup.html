@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AnimeOn Skipper</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Шапка -->
+    <header class="header">
+      <div class="logo-wrap">
+        <div class="logo-glow"></div>
+        <span class="logo-title">AnimeOn <span class="accent-text">Skipper</span></span>
+      </div>
+      <span class="badge-version">v2.3.0</span>
+    </header>
+
+    <!-- Блок текущего тайтла -->
+    <section class="card current-anime-card">
+      <div class="card-header">
+        <span class="pulse-dot" id="player-status-dot"></span>
+        <span class="card-title" id="player-status-text">Поиск плеера…</span>
+      </div>
+      <div class="anime-info">
+        <div class="anime-title" id="anime-title">Откройте аниме на animeon.cc</div>
+        <div class="anime-meta" id="anime-meta">Серия не определена</div>
+        
+        <div class="ep-selector-row">
+          <button class="ep-btn" id="btn-prev-ep" title="Предыдущая серия">‹</button>
+          <span class="ep-badge" id="ep-display">Серия 1</span>
+          <button class="ep-btn" id="btn-next-ep" title="Следующая серия">›</button>
+        </div>
+
+        <div class="timing-status" id="timing-status">
+          <span class="timing-tag">Статус: поиск таймингов…</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Аккаунт автора (Авторизация для разметки) -->
+    <section class="card auth-card">
+      <div class="card-header-flex">
+        <span class="card-title-section">Аккаунт автора</span>
+        <span class="user-role-badge" id="user-role-badge">Гость (Чтение)</span>
+      </div>
+      <div id="auth-guest-view">
+        <div class="auth-hint">Для сохранения меток опенингов и эндингов требуется авторизация:</div>
+        <div class="cf-input-row" style="margin-top: 8px;">
+          <input type="text" id="user-token-input" class="cf-input" placeholder="Токен aon_usr_…" spellcheck="false">
+          <button class="btn btn-primary btn-sm" id="btn-save-token">Войти</button>
+        </div>
+        <div style="margin-top: 8px; text-align: center;">
+          <a href="#" id="link-open-web-register" class="auth-link">🌐 Зарегистрироваться на сайте</a>
+        </div>
+      </div>
+      <div id="auth-logged-view" style="display: none;">
+        <div class="user-profile-row">
+          <div>
+            <div class="user-name" id="user-display-name">Alex</div>
+            <div class="user-stats-text" id="user-stats-text">Метки: 0 отправлено • 0 одобрено</div>
+          </div>
+          <button class="btn btn-outline btn-sm" id="btn-user-logout">Выйти</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Настройки плеера -->
+    <section class="card">
+      <div class="card-title-section">Настройки отображения</div>
+
+      <label class="toggle-row">
+        <span class="toggle-label">
+          <strong>Маркеры на таймлайне</strong>
+          <small>Цветные сегменты опенинга и эндинга</small>
+        </span>
+        <input type="checkbox" id="show-markers" class="toggle-input">
+        <span class="toggle-slider"></span>
+      </label>
+
+      <!-- Смещение времени (offset) -->
+      <div class="slider-row">
+        <div class="slider-label-wrap">
+          <span>Смещение тайминга</span>
+          <span class="slider-val" id="offset-val">0.0 сек</span>
+        </div>
+        <input type="range" id="offset-slider" min="-5" max="5" step="0.5" value="0">
+        <small class="slider-hint">Компенсация заставок озвучки (±секунды)</small>
+      </div>
+    </section>
+
+    <!-- Облачная база (Cloudflare Worker) -->
+    <section class="card cloudflare-card">
+      <div class="card-header-flex">
+        <span class="card-title-section">Облачная база</span>
+        <span class="cf-status-badge" id="cf-status-badge">⚪ Проверка…</span>
+      </div>
+      <small class="cf-hint" id="cf-hint">Автоматическая синхронизация таймкодов</small>
+    </section>
+
+    <!-- Инфо-подсказка -->
+    <section class="card hint-card">
+      <div class="hint-text">
+        ⚡ <strong>Автопропуск:</strong> синхронизируется с нативными тумблерами прямо в меню плеера (шестеренка ⚙️).
+      </div>
+    </section>
+
+    <!-- Футер -->
+    <footer class="footer">
+      <span>AnimeOn Skipper • Cloudflare Sync</span>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
