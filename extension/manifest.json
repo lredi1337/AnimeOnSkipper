@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AnimeOn Skipper — Пропуск Опенингов и Эндингов",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "Автоматический и ручной пропуск опенингов и эндингов на AnimeOn через нативные метки плеера и базу Cloudflare.",
   "permissions": [
     "storage",
@@ -19,7 +19,8 @@
     "*://*.kodik.info/*",
     "*://*.kodik.cc/*",
     "*://*.kodik.biz/*",
-    "*://*.workers.dev/*"
+    "*://*.workers.dev/*",
+    "https://api.aniskip.com/*"
   ],
   "background": {
     "service_worker": "background.js"

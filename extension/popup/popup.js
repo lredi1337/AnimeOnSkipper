@@ -170,6 +170,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   await updateAuthUI();
 
+  // Автоматически опрашиваем сервер для обновления актуальной роли (admin/trusted/user) и статистики
+  chrome.storage.local.get(['apiToken'], (res) => {
+    if (res.apiToken) {
+      chrome.runtime.sendMessage({ type: 'REFRESH_USER_PROFILE' }, (resp) => {
+        if (resp && resp.success && resp.user) {
+          updateAuthUI();
+        }
+      });
+    }
+  });
+
+  if (userRoleBadge) {
+    userRoleBadge.style.cursor = 'pointer';
+    userRoleBadge.title = 'Нажмите, чтобы обновить статус и роль с сервера';
+    userRoleBadge.addEventListener('click', () => {
+      userRoleBadge.textContent = '🔄 Обновление…';
+      chrome.runtime.sendMessage({ type: 'REFRESH_USER_PROFILE' }, (resp) => {
+        updateAuthUI();
+      });
+    });
+  }
+
   if (btnSaveToken && userTokenInput) {
     btnSaveToken.addEventListener('click', () => {
       const token = userTokenInput.value.trim();

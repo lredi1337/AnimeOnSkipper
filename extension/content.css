@@ -600,3 +600,473 @@
   visibility: visible !important;
   transform: translateY(0) !important;
 }
+
+/* =============================================================================
+   6. ПЛАВАЮЩИЙ БАННЕР ANISKIP ДЛЯ РЕДАКТОРОВ И АДМИНОВ
+   ============================================================================= */
+.aon-aniskip-prompt {
+  position: absolute !important;
+  top: 20px !important;
+  right: 20px !important;
+  z-index: 2147483646 !important;
+  max-width: 380px !important;
+  background: rgba(15, 15, 26, 0.95) !important;
+  border: 1px solid rgba(124, 77, 255, 0.45) !important;
+  border-radius: 14px !important;
+  padding: 14px 16px !important;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.7), 0 0 20px rgba(124, 77, 255, 0.2) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  font-family: inherit, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  color: #ffffff !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transform: translateY(-10px) scale(0.96) !important;
+  transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  pointer-events: none !important;
+}
+
+.aon-aniskip-prompt.aon-visible {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) scale(1) !important;
+  pointer-events: auto !important;
+}
+
+.aon-aniskip-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin-bottom: 10px !important;
+}
+
+.aon-aniskip-title-wrap {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.aon-aniskip-badge {
+  background: linear-gradient(135deg, #7c4dff, #6366f1) !important;
+  color: #ffffff !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 3px 7px !important;
+  border-radius: 6px !important;
+  letter-spacing: 0.5px !important;
+}
+
+.aon-aniskip-title {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #f1f5f9 !important;
+}
+
+.aon-aniskip-close {
+  background: transparent !important;
+  border: none !important;
+  color: #94a3b8 !important;
+  font-size: 18px !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  padding: 2px 4px !important;
+  border-radius: 4px !important;
+  transition: color 0.15s ease !important;
+}
+
+.aon-aniskip-close:hover {
+  color: #ffffff !important;
+}
+
+.aon-aniskip-times {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  margin-bottom: 12px !important;
+}
+
+.aon-aniskip-time-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 8px !important;
+  padding: 4px 10px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #e2e8f0 !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+.aon-aniskip-time-pill.op {
+  border-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+.aon-aniskip-time-pill.op .pill-tag {
+  color: #f59e0b !important;
+  font-weight: 700 !important;
+}
+
+.aon-aniskip-time-pill.ed {
+  border-color: rgba(6, 182, 212, 0.4) !important;
+}
+
+.aon-aniskip-time-pill.ed .pill-tag {
+  color: #06b6d4 !important;
+  font-weight: 700 !important;
+}
+
+.aon-aniskip-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.aon-aniskip-btn-apply {
+  flex: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 8px 14px !important;
+  background: linear-gradient(135deg, #7c4dff, #6366f1) !important;
+  color: #ffffff !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 14px rgba(124, 77, 255, 0.35) !important;
+  transition: all 0.2s ease !important;
+}
+
+.aon-aniskip-btn-apply:hover {
+  background: linear-gradient(135deg, #9065ff, #7c4dff) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 18px rgba(124, 77, 255, 0.5) !important;
+}
+
+.aon-aniskip-btn-dismiss {
+  padding: 8px 12px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #cbd5e1 !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.aon-aniskip-btn-dismiss:hover {
+  background: rgba(255, 255, 255, 0.14) !important;
+  color: #ffffff !important;
+}
+
+.aon-hud-btn-aniskip {
+  background: rgba(99, 102, 241, 0.15) !important;
+  border-color: rgba(99, 102, 241, 0.4) !important;
+  color: #a5b4fc !important;
+}
+
+.aon-hud-btn-aniskip:hover {
+  background: rgba(99, 102, 241, 0.3) !important;
+  color: #ffffff !important;
+}
+
+/* =============================================================================
+   12. МОДАЛЬНОЕ ПРЕДЛОЖЕНИЕ И ХУД АВТОПЕРЕНОСА НА ВЕСЬ ТАЙТЛ
+   ============================================================================= */
+.aon-native-prompt {
+  position: absolute !important;
+  top: 24px !important;
+  left: 50% !important;
+  transform: translateX(-50%) translateY(0) !important;
+  z-index: 2147483647 !important;
+  width: min(500px, calc(100% - 32px)) !important;
+  pointer-events: auto !important;
+  user-select: none !important;
+}
+
+.aon-native-prompt-enter {
+  animation: aonPromptSlideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.aon-native-prompt-exit {
+  animation: aonPromptSlideUp 0.25s ease forwards !important;
+}
+
+@keyframes aonPromptSlideDown {
+  from { opacity: 0; transform: translateX(-50%) translateY(-24px) scale(0.95); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+
+@keyframes aonPromptSlideUp {
+  from { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+  to { opacity: 0; transform: translateX(-50%) translateY(-20px) scale(0.95); }
+}
+
+.aon-np-content {
+  position: relative !important;
+  background: rgba(15, 15, 26, 0.96) !important;
+  border: 1px solid rgba(139, 92, 246, 0.4) !important;
+  border-radius: 16px !important;
+  padding: 16px 20px !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75), 0 0 30px rgba(124, 77, 255, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  font-family: inherit, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+.aon-np-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 8px !important;
+}
+
+.aon-np-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 3px 10px !important;
+  background: rgba(139, 92, 246, 0.2) !important;
+  border: 1px solid rgba(139, 92, 246, 0.4) !important;
+  border-radius: 9999px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #c4b5fd !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+.aon-np-close {
+  background: transparent !important;
+  border: none !important;
+  color: #94a3b8 !important;
+  font-size: 20px !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  padding: 2px 6px !important;
+  border-radius: 6px !important;
+  transition: all 0.15s ease !important;
+}
+
+.aon-np-close:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.aon-np-title {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #f8fafc !important;
+  margin-bottom: 4px !important;
+}
+
+.aon-np-desc {
+  font-size: 13px !important;
+  line-height: 1.45 !important;
+  color: #cbd5e1 !important;
+  margin-bottom: 14px !important;
+}
+
+.aon-np-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+}
+
+.aon-np-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 8px 16px !important;
+  border-radius: 10px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  border: none !important;
+}
+
+.aon-np-btn-yes {
+  background: linear-gradient(135deg, #8b5cf6, #6366f1) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(124, 77, 255, 0.4) !important;
+}
+
+.aon-np-btn-yes:hover {
+  background: linear-gradient(135deg, #9d72ff, #7377f8) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 20px rgba(124, 77, 255, 0.55) !important;
+}
+
+.aon-np-btn-no {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #94a3b8 !important;
+}
+
+.aon-np-btn-no:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+}
+
+/* =============================================================================
+   13. ХУД ИНДИКАТОР ПРОГРЕССА АВТОПЕРЕНОСА (Progress HUD)
+   ============================================================================= */
+.aon-crawl-hud {
+  position: absolute !important;
+  top: 24px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 2147483647 !important;
+  width: min(480px, calc(100% - 32px)) !important;
+  pointer-events: auto !important;
+  user-select: none !important;
+  animation: aonPromptSlideDown 0.3s ease forwards !important;
+}
+
+.aon-ch-card {
+  background: rgba(13, 13, 22, 0.96) !important;
+  border: 1px solid rgba(139, 92, 246, 0.45) !important;
+  border-radius: 14px !important;
+  padding: 14px 18px !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75), 0 0 25px rgba(124, 77, 255, 0.25) !important;
+  color: #ffffff !important;
+  font-family: inherit, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+.aon-ch-top {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 10px !important;
+}
+
+.aon-ch-title-wrap {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.aon-ch-indicator {
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50% !important;
+  background: #a855f7 !important;
+  box-shadow: 0 0 10px #a855f7 !important;
+  animation: aonPulseDot 1.4s infinite !important;
+}
+
+@keyframes aonPulseDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.6; }
+}
+
+.aon-ch-title {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: #f1f5f9 !important;
+}
+
+.aon-ch-count {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #c4b5fd !important;
+  font-family: "JetBrains Mono", Consolas, monospace !important;
+}
+
+.aon-ch-bar-bg {
+  width: 100% !important;
+  height: 6px !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 9999px !important;
+  overflow: hidden !important;
+  margin-bottom: 10px !important;
+}
+
+.aon-ch-bar-fill {
+  height: 100% !important;
+  background: linear-gradient(90deg, #8b5cf6, #ec4899) !important;
+  border-radius: 9999px !important;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.8) !important;
+}
+
+.aon-ch-bottom {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.aon-ch-status {
+  font-size: 12px !important;
+  color: #94a3b8 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 320px !important;
+}
+
+.aon-ch-btn-stop {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border: 1px solid rgba(239, 68, 68, 0.35) !important;
+  color: #fca5a5 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  padding: 4px 10px !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.aon-ch-btn-stop:hover {
+  background: rgba(239, 68, 68, 0.28) !important;
+  color: #ffffff !important;
+}
+
+/* =============================================================================
+   14. КНОПКА АВТОПЕРЕНОСА В HUD РЕДАКТОРЕ
+   ============================================================================= */
+.aon-hud-crawl-btn {
+  width: 100% !important;
+  margin-bottom: 8px !important;
+  padding: 10px 14px !important;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(99, 102, 241, 0.3)) !important;
+  border: 1px solid rgba(139, 92, 246, 0.6) !important;
+  border-radius: 10px !important;
+  color: #ede9fe !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  box-shadow: 0 4px 14px rgba(124, 77, 255, 0.2) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-sizing: border-box !important;
+}
+
+.aon-hud-crawl-btn:hover {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.5), rgba(99, 102, 241, 0.5)) !important;
+  border-color: rgba(167, 139, 250, 0.9) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 20px rgba(124, 77, 255, 0.4) !important;
+}
+
+.aon-hud-crawl-btn:active {
+  transform: translateY(0) !important;
+}
+

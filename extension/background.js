@@ -105,6 +105,64 @@ async function verifyUserToken(workerUrl, token) {
   }
 }
 
+// Запрос таймингов напрямую из AniSkip (через Worker с прямым fallback на API)
+async function fetchFromAniSkip(workerUrl, malId, episode) {
+  if (!malId || !episode) return { found: false };
+  // 1. Пробуем через прокси Cloudflare Worker (с встроенной валидацией)
+  try {
+    const cleanUrl = (workerUrl || '').trim().replace(/\/+$/, '');
+    if (cleanUrl) {
+      const res = await fetch(`${cleanUrl}/api/aniskip/query?malId=${malId}&episode=${episode}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.found && (data.op || data.ed)) {
+          return { found: true, op: data.op, ed: data.ed };
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('[AnimeOn Skipper] Запрос AniSkip через Worker не удался:', e);
+  }
+
+  // 2. Прямой fallback на api.aniskip.com
+  try {
+    const res = await fetch(`https://api.aniskip.com/v2/skip-times/${malId}/${episode}?types%5B%5D=op&types%5B%5D=ed&episodeLength=0`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.found && Array.isArray(data.results)) {
+        let op = null;
+        let ed = null;
+        for (const r of data.results) {
+          if (r.skipType === 'op' && r.interval) {
+            op = [Math.floor(r.interval.startTime), Math.floor(r.interval.endTime)];
+          } else if (r.skipType === 'ed' && r.interval) {
+            ed = [Math.floor(r.interval.startTime), Math.floor(r.interval.endTime)];
+          }
+        }
+        if (op || ed) {
+          return { found: true, op, ed };
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('[AnimeOn Skipper] Прямой запрос к AniSkip API не удался:', e);
+  }
+
+  return { found: false };
+}
+
+// Автоматическая фоновая синхронизация профиля при запуске
+chrome.runtime.onStartup.addListener(() => {
+  chrome.storage.local.get(['apiToken'], (res) => {
+    if (res.apiToken) verifyUserToken(CLOUDFLARE_WORKER_URL, res.apiToken);
+  });
+});
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.storage.local.get(['apiToken'], (res) => {
+    if (res.apiToken) verifyUserToken(CLOUDFLARE_WORKER_URL, res.apiToken);
+  });
+});
+
 // Обработчик сообщений расширения
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   const tabId = sender?.tab?.id;
@@ -170,9 +228,73 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       return true;
     }
 
+    // Запрос таймкодов из базы AniSkip (для автоподсказок редакторам и админам)
+    case 'FETCH_ANISKIP_TIMINGS': {
+      const { malId, episode } = message;
+      fetchFromAniSkip(CLOUDFLARE_WORKER_URL, malId, episode).then((res) => {
+        sendResponse({ success: true, ...res });
+      }).catch((err) => {
+        sendResponse({ success: false, found: false, error: err.message });
+      });
+      return true;
+    }
+
+    // Принудительное обновление роли и профиля пользователя из базы
+    case 'REFRESH_USER_PROFILE': {
+      chrome.storage.local.get(['apiToken'], async (res) => {
+        if (!res.apiToken) {
+          sendResponse({ success: false, error: 'Токен отсутствует' });
+          return;
+        }
+        const verifyRes = await verifyUserToken(CLOUDFLARE_WORKER_URL, res.apiToken);
+        sendResponse(verifyRes);
+      });
+      return true;
+    }
+
+    // Автоматический экспорт нативных таймингов AnimeOn в базу Cloudflare
+    case 'AUTO_SUBMIT_NATIVE_TIMINGS': {
+      const { malId, episode, op, ed, title, totalEpisodes } = message;
+      if (!malId || !episode || (!op && !ed)) {
+        sendResponse({ success: false, reason: 'invalid_payload' });
+        return true;
+      }
+
+      // 1. Проверяем текущее состояние в базе Cloudflare Worker
+      fetchFromCloudflare(CLOUDFLARE_WORKER_URL, malId, episode).then(async (cfData) => {
+        // Не перезаписываем только подтвержденные вручную тайминги доверенных пользователей/админов (если не передан флаг overwrite)
+        if (!message.overwrite && cfData && cfData.success && cfData.found && cfData.op && cfData.ed && cfData.source !== 'aniskip-pending' && cfData.source !== 'animeon_native') {
+          sendResponse({ success: true, alreadyExists: true });
+          return;
+        }
+
+        chrome.storage.local.get(['apiToken'], async (res) => {
+          const token = res.apiToken || '';
+          const pushRes = await pushToCloudflare(CLOUDFLARE_WORKER_URL, {
+            malId,
+            episode,
+            title: title || '',
+            totalEpisodes: totalEpisodes || null,
+            op: op || null,
+            ed: ed || null,
+            source: 'animeon_native'
+          }, token);
+
+          sendResponse({
+            success: true,
+            saved: !!(pushRes && pushRes.success)
+          });
+        });
+      }).catch(() => {
+        sendResponse({ success: false });
+      });
+
+      return true;
+    }
+
     // Сохранение кастомного таймкода серии (требует обязательной авторизации)
     case 'SAVE_CUSTOM_SKIP': {
-      const { malId, episode, op, ed, title, season, totalEpisodes } = message;
+      const { malId, episode, op, ed, title, totalEpisodes } = message;
       const key = `${malId}:${episode}`;
 
       chrome.storage.local.get([
@@ -196,7 +318,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           op: op || customSkips[key]?.op || null,
           ed: ed || customSkips[key]?.ed || null,
           title: title || customSkips[key]?.title || '',
-          season: season || 1,
           totalEpisodes: totalEpisodes || null,
           updatedAt: Date.now()
         };
@@ -209,7 +330,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           op: customSkips[key].op,
           ed: customSkips[key].ed,
           title: customSkips[key].title,
-          season: customSkips[key].season,
           totalEpisodes: customSkips[key].totalEpisodes
         }, result.apiToken);
 
